@@ -1,2 +1,7 @@
 node_modules
 build/
+/**/venv
+.idea/
+/**/data
+/**/migra
+/**/__pycache__

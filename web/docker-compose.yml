@@ -1,0 +1,31 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  db:
+    image: mysql:8.0.32-debian
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: qwer1234
+      MYSQL_DATABASE: test
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-P", "3307", "-pqwer1234"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 3307:3306
+
+  back:
+    build:
+      context: ./back
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && gunicorn config.wsgi --bind 0.0.0.0:8000"
+    ports:
+      - 8000:8000
+    depends_on:
+      db:
+        condition: service_healthy
+
+  front:
+    build:
+      context: ./front
+    ports:
+      - 80:80
